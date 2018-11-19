@@ -1,32 +1,36 @@
 <!DOCTYPE html>
 <html>
-<head>
-    
-    <link rel="stylesheet" href="style.css">
-    <title>Page Title</title>
-
-</head>
+  <head>
+    <title>Word Guess</title>
+    <link rel="stylesheet" type = "text/css" href="style.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  </head>
 
 <body>
 
-<div class="hangman">
-   
-    <div class="guess"></div>
-    <form class="guessForm">
-    <input type="text" class="guessLetter" maxlength="1"  placeholder="Enter a letter . . . &#x23ce;"/> <button type="submit" class="guessButton">Guess</button>
-    </form>  
-    
-    <div class="wrong">
-      <div class="wrongLetters"></div>
+<div class="wrapper">
+   <h1>Hangman</h1>
+    <h2>Word Guess</h2>
+    <p>Use the alphabet below to guess the word, or click hint to get a clue. </p>
+</div>
+<div class="wrapper">
+    <div id="buttons">
+    </div>  
+    <p id="catagoryName"></p>
+    <div id="hold">
     </div>
-    <div class="message">
-      <h1 class="title"></h1>
-      <p class="text"></p>
-      <button class="restart button">Play Again?</button>
-      
+    <p id="mylives"></p>
+    <p id="clue">Clue -</p>  
+     <canvas id="stickman">This Text will show if the Browser does NOT support HTML5 Canvas tag</canvas>
+    <div class="container">
+      <button id="hint">Hint</button>
+      <button id="reset">Play again</button>
     </div>
-  </div>
+</div>
 
 </body>
-
 </html>
+
+
+
+

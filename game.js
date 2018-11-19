@@ -1,257 +1,229 @@
+window.onload = function () {
 
-(function($, window, undefined){
-
-    Hangman = {
-      init: function(words){
-        this.words = words,
-        this.hm = $(".hangman"),
-        this.msg = $(".message"),
-        this.msgTitle = $(".title"),
-        this.msgText = $(".text"),
-        this.restart = $(".restart"),
-        this.wrd = this.randomWord(),
-        this.correct = 0,
-        this.guess = $(".guess"),
-        this.wrong = $(".wrong"),
-        this.wrongGuesses = [],
-        this.rightGuesses = [],
-        this.guessForm = $(".guessForm"),
-        this.guessLetterInput = $(".guessLetter"),
-        this.goodSound = new Audio("https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/goodbell.mp3"),
-        this.badSound = new Audio("https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/bad.mp3"),
-        this.winSound = new Audio("https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/win.mp3"),
-        this.loseSound = new Audio("https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/lose.mp3"),
-        this.setup();
-      },
-  
-  
-      setup: function(){
-        this.binding();
-        this.sounds();
-        this.showGuess(this.wrongGuesses);
-        this.showWrong();
-  
-      },
-  
-      
-      sounds: function(){  
-        this.badSound.volume = .4;
-        this.goodSound.volume = .4;
-        this.winSound.volume = .8;
-        this.loseSound.volume = .4;
-        
-      },
-      
-      
-      binding: function(){
-        this.guessForm.on("submit", $.proxy(this.theGuess, this));
-        this.restart.on("click", $.proxy(this.theRestart, this));
-      },
-  
-  
-      playSound: function(sound){
-        this.stopSound(sound);
-        this[sound].play();
-      },
-  
-  
-      stopSound: function(sound){
-        this[sound].pause();
-        this[sound].currentTime = 0;
-  
-      },
-  
-  
-      theRestart: function(e){
-        e.preventDefault();
-        this.stopSound("winSound");
-        this.stopSound("loseSound");
-        this.reset();
-      },
-  
-  
-      theGuess: function(e){
-        e.preventDefault();
-        var guess = this.guessLetterInput.val();
-        if(guess.match(/[a-zA-Z]/) && guess.length == 1){
-          if($.inArray(guess, this.wrongGuesses) > -1 || $.inArray(guess, this.rightGuesses) > -1){
-            this.playSound("badSound");
-            this.guessLetterInput.val("").focus();
-          }
-          else if(guess) {
-            var foundLetters = this.checkGuess(guess);
-            if(foundLetters.length > 0){
-              this.setLetters(foundLetters);
-              this.playSound("goodSound");
-              this.guessLetterInput.val("").focus();
-            } else {
-              this.wrongGuesses.push(guess);
-              if(this.wrongGuesses.length == 10){
-                this.lose();
-              } else {
-                this.showWrong(this.wrongGuesses);
-                this.playSound("badSound");
-              }
-              this.guessLetterInput.val("").focus();
-            }
-          }
-        } else {
-          this.guessLetterInput.val("").focus();
-        }
-      },
-  
-      randomWord: function(){
-        return this._wordData(this.words[ Math.floor(Math.random() * this.words.length)] );
-      },
-  
-  
-      showGuess: function(){
-        var frag = "<ul class='word'>";
-        $.each(this.wrd.letters, function(key, val){
-          frag += "<li data-pos='" +  key  + "' class='letter'>*</li>";
-        });
-        frag += "</ul>";
-        this.guess.html(frag);
-      },
-  
-  
-      showWrong: function(wrongGuesses){
-        if(wrongGuesses){
-          var frag = "<ul class='wrongLetters'>";
-          frag += "<p>Wrong Letters: </p>";
-          $.each(wrongGuesses, function(key, val){
-            frag += "<li>" + val + "</li>";
-          });
-          frag += "</ul>";
-        }
-        else {
-          frag = "";
-        }
-  
-        this.wrong.html(frag);
-      },
-  
-  
-      checkGuess: function(guessedLetter){
-        var _ = this;
-        var found = [];
-        $.each(this.wrd.letters, function(key, val){
-          if(guessedLetter == val.letter.toLowerCase()){
-            found.push(val);
-            _.rightGuesses.push(val.letter);
-          }
-        });
-        return found;
-  
-      },
-  
-  
-      setLetters: function(letters){
-        var _ = this;
-        _.correct = _.correct += letters.length;
-        $.each(letters, function(key, val){
-          var letter = $("li[data-pos=" +val.pos+ "]");
-          letter.html(val.letter);
-          letter.addClass("correct");
-  
-          if(_.correct  == _.wrd.letters.length){
-            _.win();
-          }
-        });
-      },
-  
-  
-      _wordData: function(word){
-  
-        return {
-          letters: this._letters(word),
-          word: word.toLowerCase(),
-          totalLetters: word.length
-        };
-      },
-  
-  
-      hideMsg: function(){
-        this.msg.hide();
-        this.msgTitle.hide();
-        this.restart.hide();
-        this.msgText.hide();
-      },
-  
-  
-      showMsg: function(){
-        var _ = this;
-        _.msg.show("blind", function(){
-          _.msgTitle.show("bounce", "slow", function(){
-            _.msgText.show("slide", function(){
-              _.restart.show("fade");
-            });
-  
-          });
-  
-        });
-      },
-  
-  
-      reset: function(){
-        this.hideMsg();
-        this.init(this.words);
-        this.hm.find(".guessLetter").focus();
-  
-      },
-  
-  
-      _letters: function(word){
-        var letters = [];
-        for(var i=0; i<word.length; i++){
-          letters.push({
-            letter: word[i],
-            pos: i
-          });
-        }
-        return letters;
-      },
-  
-  
-      rating: function(){
-        var right = this.rightGuesses.length,
-            wrong = this.wrongGuesses.length || 0,
-            rating = {
-              rating: Math.floor(( right / ( wrong + right )) * 100),
-              guesses: (right + wrong)
-              
-            };
-        return rating;
-      },
-  
-      win: function(){
-        var rating = this.rating();
-        this.msgTitle.html("Awesome, You Won!");
-        // this is messy
-        this.msgText.html("You solved the word in <span class='highlight'>" + rating.guesses + "</span> Guesses!<br>Score: <span class='highlight'>" + rating.rating + "%</span>");
-        this.showMsg();
-        this.playSound("winSound");
-  
-      },
-  
-  
-      lose: function(){
-        this.msgTitle.html("You Lost.. The word was <span class='highlight'>"+ this.wrd.word +"</span>");
-        this.msgText.html("Don't worry, you'll get the next one!");
-        this.showMsg();
-        this.playSound("loseSound");
-      }
+    var alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
+          'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
+          't', 'u', 'v', 'w', 'x', 'y', 'z'];
     
+    var categories;         // Array of topics
+    var chosenCategory;     // Selected catagory
+    var getHint;          // Word getHint
+    var word;              // Selected word
+    var guess;             // Geuss
+    var geusses = [ ];      // Stored geusses
+    var lives;             // Lives
+    var counter;           // Count correct geusses
+    var space;              // Number of spaces in word '-'
+  
+    // Get elements
+    var showLives = document.getElementById("mylives");
+    var showCatagory = document.getElementById("scatagory");
+    var getHint = document.getElementById("hint");
+    var showClue = document.getElementById("clue");
+  
+  
+  
+    // create alphabet ul
+    var buttons = function () {
+      myButtons = document.getElementById('buttons');
+      letters = document.createElement('ul');
+  
+      for (var i = 0; i < alphabet.length; i++) {
+        letters.id = 'alphabet';
+        list = document.createElement('li');
+        list.id = 'letter';
+        list.innerHTML = alphabet[i];
+        check();
+        myButtons.appendChild(letters);
+        letters.appendChild(list);
+      }
+    }
+      
+    
+    // Select Catagory
+    var selectCat = function () {
+      if (chosenCategory === categories[0]) {
+        catagoryName.innerHTML = " THe CHosen Categoty Is";
+      } else if (chosenCategory === categories[1]) {
+        catagoryName.innerHTML = "The Chosen Category Is ";
+      } else if (chosenCategory === categories[2]) {
+        catagoryName.innerHTML = "The Chosen Category Is ";
+      }
+    }
+  
+    // Create geusses ul
+     result = function () {
+      wordHolder = document.getElementById('hold');
+      correct = document.createElement('ul');
+  
+      for (var i = 0; i < word.length; i++) {
+        correct.setAttribute('id', 'my-word');
+        guess = document.createElement('li');
+        guess.setAttribute('class', 'guess');
+        if (word[i] === "-") {
+          guess.innerHTML = "-";
+          space = 1;
+        } else {
+          guess.innerHTML = "_";
+        }
+  
+        geusses.push(guess);
+        wordHolder.appendChild(correct);
+        correct.appendChild(guess);
+      }
+    }
+    
+    // Show lives
+     comments = function () {
+      showLives.innerHTML = "You have " + lives + " lives";
+      if (lives < 1) {
+        showLives.innerHTML = "Game Over";
+      }
+      for (var i = 0; i < geusses.length; i++) {
+        if (counter + space === geusses.length) {
+          showLives.innerHTML = "You Win!";
+        }
+      }
+    }
+  
+        // Animate man
+    var animate = function () {
+      var drawMe = lives ;
+      drawArray[drawMe]();
+    }
+  
+    
+     // Hangman
+    canvas =  function(){
+  
+      myStickman = document.getElementById("stickman");
+      context = myStickman.getContext('2d');
+      context.beginPath();
+      context.strokeStyle = "#fff";
+      context.lineWidth = 2;
+    };
+    
+      head = function(){
+        myStickman = document.getElementById("stickman");
+        context = myStickman.getContext('2d');
+        context.beginPath();
+        context.arc(60, 25, 10, 0, Math.PI*2, true);
+        context.stroke();
+      }
+      
+    draw = function($pathFromx, $pathFromy, $pathTox, $pathToy) {
+      
+      context.moveTo($pathFromx, $pathFromy);
+      context.lineTo($pathTox, $pathToy);
+      context.stroke(); 
+  }
+  
+     frame1 = function() {
+       draw (0, 150, 150, 150);
+     };
+     
+     frame2 = function() {
+       draw (10, 0, 10, 600);
+     };
+    
+     frame3 = function() {
+       draw (0, 5, 70, 5);
+     };
+    
+     frame4 = function() {
+       draw (60, 5, 60, 15);
+     };
+    
+     torso = function() {
+       draw (60, 36, 60, 70);
+     };
+    
+     rightArm = function() {
+       draw (60, 46, 100, 50);
+     };
+    
+     leftArm = function() {
+       draw (60, 46, 20, 50);
+     };
+    
+     rightLeg = function() {
+       draw (60, 70, 100, 100);
+     };
+    
+     leftLeg = function() {
+       draw (60, 70, 20, 100);
+     };
+    
+    drawArray = [rightLeg, leftLeg, rightArm, leftArm,  torso,  head, frame4, frame3, frame2, frame1]; 
+  
+  
+    // OnClick Function
+     check = function () {
+      list.onclick = function () {
+        var geuss = (this.innerHTML);
+        this.setAttribute("class", "active");
+        this.onclick = null;
+        for (var i = 0; i < word.length; i++) {
+          if (word[i] === geuss) {
+            geusses[i].innerHTML = geuss;
+            counter += 1;
+          } 
+        }
+        var j = (word.indexOf(geuss));
+        if (j === -1) {
+          lives -= 1;
+          comments();
+          animate();
+        } else {
+          comments();
+        }
+      }
+    }
+    
+      
+    // Play
+    play = function () {
+      categories = ["technology", "coding", "programming", "software", "engineering"],
+                    [],
+                    [];
+  
+      chosenCategory = categories[Math.floor(Math.random() * categories.length)];
+      word = chosenCategory[Math.floor(Math.random() * chosenCategory.length)];
+      word = word.replace(/\s/g, "-");
+      console.log(word);
+      buttons();
+  
+      geusses = [ ];
+      lives = 10;
+      counter = 0;
+      space = 0;
+      result();
+      comments();
+      selectCat();
+      canvas();
+    }
+  
+    play();
+    
+    // Hint
+  
+      hint.onclick = function() {
+  
+        hints = ["hardware", "software", "input devices", "technology areas"]
+                [],
+                [];
+  
+      var catagoryIndex = categories.indexOf(chosenCategory);
+      var hintIndex = chosenCategory.indexOf(word);
+      showClue.innerHTML = "Clue: - " +  hints [catagoryIndex][hintIndex];
     };
   
-    var wordList = ["chrome", "firefox", "codepen", "javascript", "jquery", "cyber", "github", "security", "autonomous", "robotics", "KISS", "standards", "automations", "keyboard", "developer", "touch pad", "token", "website", "bandwidth", "hexadecimal", "core", "DRY", "mobile", "access", "bitmap", "biometrics", "responsive", "programmer", "css", "dynamic", "static", "database", "pixel", "memory", "object", "install", "process", "bootstrap", "python", "php", "defragment", "ajax", "node", "bug", "client", "application", "backend", "apple", "google", "microsoft", "frontend", "internet", "fiber", "ddr", "background", "property", "syntax", "flash", "html", "font", "blog", "network", "server", "content", "database", "socket", "function", "variable", "link", "apache", "query", "proxy", "backbone", "angular", "email", "underscore", "cloud"];
+     // Reset
   
-    Hangman.init(wordList);
-    
-  })(jQuery, window);
-  
-  
-  
-    
-    
-  
+    document.getElementById('reset').onclick = function() {
+      correct.parentNode.removeChild(correct);
+      letters.parentNode.removeChild(letters);
+      showClue.innerHTML = "";
+      context.clearRect(0, 0, 400, 400);
+      play();
+    }
+  }
