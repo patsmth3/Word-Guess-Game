@@ -1,15 +1,25 @@
 window.onload = function () {
+    var wordList = ["chrome", "firefox", "codepen", "javascript", 
+            "jquery", "twitter", "github", "wordpress", "opera", 
+            "sass", "layout", "standards", "semantic", "designer", 
+            "developer", "module", "component", "website", "creative", 
+            "banner", "browser", "screen", "mobile", "footer", "header", 
+            "typography", "responsive", "programmer", "css", "border", "compass", 
+            "grunt", "pixel", "document", "object", "ruby", "modernizr", "bootstrap", 
+            "python", "php", "pattern", "ajax", "node", "element", "android", "application", 
+            "adobe", "apple", "google", "microsoft", "bookmark", "internet", "icon", "svg", 
+            "background", "property", "syntax", "flash", "html", "font", "blog", "network", 
+            "server", "content", "database", "socket", "function", "variable", "link", "apache", 
+            "query", "proxy", "backbone", "angular", "email", "underscore", "cloud"];
 
-    var alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
-          'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
-          't', 'u', 'v', 'w', 'x', 'y', 'z'];
-    
+    var Answer;             //the correct word
     var categories;         // Array of topics
     var chosenCategory;     // Selected catagory
     var getHint;          // Word getHint
     var word;              // Selected word
     var guess;             // Geuss
-    var geusses = [ ];      // Stored geusses
+    // var geusses = [ ];      // Stored geusses
+    var guessesArray = [];
     var lives;             // Lives
     var counter;           // Count correct geusses
     var space;              // Number of spaces in word '-'
@@ -19,7 +29,11 @@ window.onload = function () {
     var showCatagory = document.getElementById("scatagory");
     var getHint = document.getElementById("hint");
     var showClue = document.getElementById("clue");
-  
+    
+
+    word = wordList[Math.floor(Math.random() * wordList.length)];
+
+    console.log(word);
   
   
     // create alphabet ul
@@ -38,18 +52,34 @@ window.onload = function () {
       }
     }
       
-    
-    // Select Catagory
-    var selectCat = function () {
-      if (chosenCategory === categories[0]) {
-        catagoryName.innerHTML = " THe CHosen Categoty Is";
-      } else if (chosenCategory === categories[1]) {
-        catagoryName.innerHTML = "The Chosen Category Is ";
-      } else if (chosenCategory === categories[2]) {
-        catagoryName.innerHTML = "The Chosen Category Is ";
+    document.onkeyup = function(event) {
+
+      // Determines which key was pressed.
+      var userGuess = event.key;
+      
+      // creates a variable called guesses and attaches it to the guesses-text div
+      var guesses = document.getElementById("guess-text");
+
+      var repeat = false;
+
+      if (guessesArray.length === 0) {
+          guessesArray.push(userGuess);
+      } else {
+          for (i=0; i<guessesArray.length; i++) {
+              if (userGuess === guessesArray[i]) {
+                  repeat = true;
+              }
+          }
+
+          if (repeat === false) {
+              guessesArray.push(userGuess);
+          }
       }
+      // Adds guess to the guesses-remaining-text div element.
+    guesses.textContent = guessesArray;
+    console.log(guessesArray);
     }
-  
+    
     // Create geusses ul
      result = function () {
       wordHolder = document.getElementById('hold');
@@ -178,45 +208,7 @@ window.onload = function () {
         }
       }
     }
-    
       
-    // Play
-    play = function () {
-      categories = ["technology", "coding", "programming", "software", "engineering"],
-                    [],
-                    [];
-  
-      chosenCategory = categories[Math.floor(Math.random() * categories.length)];
-      word = chosenCategory[Math.floor(Math.random() * chosenCategory.length)];
-      word = word.replace(/\s/g, "-");
-      console.log(word);
-      buttons();
-  
-      geusses = [ ];
-      lives = 10;
-      counter = 0;
-      space = 0;
-      result();
-      comments();
-      selectCat();
-      canvas();
-    }
-  
-    play();
-    
-    // Hint
-  
-      hint.onclick = function() {
-  
-        hints = ["hardware", "software", "input devices", "technology areas"]
-                [],
-                [];
-  
-      var catagoryIndex = categories.indexOf(chosenCategory);
-      var hintIndex = chosenCategory.indexOf(word);
-      showClue.innerHTML = "Clue: - " +  hints [catagoryIndex][hintIndex];
-    };
-  
      // Reset
   
     document.getElementById('reset').onclick = function() {

@@ -1,12 +1,14 @@
-/* Variabes */  
-$orange: #ffa600;
-$green: #c1d72e;
-$blue: #82d2e5;
-$grey:#f3f3f3;
-$white: #fff;
-$base-color:$green ;
+/* Color Scheme*/
 
-/* Mixin's */ 
+/* lavendar: #E8D4F7;
+yellow: #FDED2A;
+Gold: #B8AA14;
+black:#343009;
+white: #ffffff;
+base-color:#700CBC; */
+
+
+/*Formatting*/
 
 @mixin transition {
   -webkit-transition: all 0.5s ease-in-out;
@@ -54,9 +56,9 @@ $base-color:$green ;
 }
 
 body {
-  background:$base-color;
+  background-color:#700CBC;
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
-  color:$white;
+  color:#B8AA14;
   height:100%;
   text-align:center;
   font-size:18px;
@@ -70,8 +72,8 @@ body {
 
 
 canvas{
-  color:$white;
-  border: $white dashed 2px;
+  color: #E8D4F7;
+  border: #E8D4F7 dashed 2px;
   padding:15px;
 }
 
@@ -108,16 +110,16 @@ p{
   width:35px;
   height:30px;
   padding-top:10px;
-  background:$white;
-  color:$base-color;
+  background:#700CBC;
+  color:#E8D4F7;
   cursor:pointer;
   @include corners(5px);
-  border: solid 1px $white;
+  border: solid 1px #E8D4F7;
     
     &:hover{
-      background:$base-color;
-      border: solid 1px $white;
-      color:$white;
+      background-color:#700CBC;
+      border:solid 1px #E8D4F7;
+      color:white;
     }
 }
 
@@ -139,7 +141,7 @@ p{
 
 .active {
   @include opacity;
-  cursor:default;
+  cursor: default;
     
   &:hover{
       @include fade;
@@ -148,16 +150,16 @@ p{
 }
 
 #mylives{
-  font-size:1.6em;
-  text-align:center;
-  display:block;
+  font-size: 1.6em;
+  text-align: center;
+  display: block;
 }
 
 button{
   @include corners (5px);
-  background:$base-color;
-  color:$white;
-  border: solid 1px $white;
+  background:#343009;
+  color: #FDED2A;
+  border:solid 1px #FDED2A;
   text-decoration:none;
   cursor:pointer;
   font-size:1.2em;
@@ -168,9 +170,9 @@ button{
   
     &:hover{
       @include transition;
-      background:$white;
-      border: solid 1px $white;
-      color:$base-color;
+      background:#E8D4F7;
+      border: solid 1px #ffffff;
+      color: #700CBC;
     }
 }
 
